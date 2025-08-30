@@ -18,7 +18,8 @@ public class WeatherApp {
       JSONArray locationData = getLocationData(locationName);
 
       // extract longitude and latitude data
-      JSONObject location = (JSONObject) locationData.get(0);
+      assert locationData != null;
+      JSONObject location = (JSONObject) locationData.getFirst();
       double latitude = (double) location.get("latitude");
       double longitude = (double) location.get("longitude");
 
@@ -31,6 +32,7 @@ public class WeatherApp {
          HttpURLConnection connection = fetchApiResponse(urlString);
 
          // check for response status
+         assert connection != null;
          if (connection.getResponseCode() != 200) {
             System.out.println("Error: Could not connect to API for location coordination");
 
@@ -97,9 +99,7 @@ public class WeatherApp {
       // replace any whitespace in location name to '+' to adhere to API's request format
       locationName = locationName.replaceAll(" ", "+");
 
-      // build API url with location parameter
-      String urlString = "https://geocoding-api.open-meteo.com/v1/search?name=" +
-              locationName + "&count=10&language=en&format=json";
+      String urlString = "https://geocoding-api.open-meteo.com/v1/search?name=" + locationName + "&count=10&language=en&format=json";
 
       try {
          HttpURLConnection connection = fetchApiResponse(urlString);
