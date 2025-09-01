@@ -10,6 +10,8 @@ import java.io.IOException;
 public class WeatherAppGui extends JFrame {
    private JSONObject weatherData;
 
+   String currentTime = WeatherApp.getCurrentTime();
+
    // create GUI constructor
    public WeatherAppGui() {
       super("Weather App");
@@ -39,14 +41,22 @@ public class WeatherAppGui extends JFrame {
       searchTextField.setFont(new Font("Poppins", Font.PLAIN, 24));
       add(searchTextField);
 
+      // time text
+      JLabel timeText = new JLabel();
+      timeText.setText(currentTime);
+      timeText.setBounds(0, 75, 450, 64);
+      timeText.setFont(new Font("Poppins", Font.PLAIN, 24));
+      timeText.setHorizontalAlignment(SwingConstants.CENTER);
+      add(timeText);
+
       // weather image
       JLabel weatherConditionImage = new JLabel(loadImage("src/assets/cloudy.png"));
-      weatherConditionImage.setBounds(0, 115,450, 217);
+      weatherConditionImage.setBounds(0, 135,450, 217);
       add(weatherConditionImage);
 
       // temperature text
       JLabel temperatureText = new JLabel("10ºC");
-      temperatureText.setBounds(0, 340, 450, 54);
+      temperatureText.setBounds(0, 370, 450, 54);
       temperatureText.setFont(new Font("Poppins", Font.BOLD, 48));
 
       // center the text
@@ -55,7 +65,7 @@ public class WeatherAppGui extends JFrame {
 
       // weather condition description
       JLabel weatherConditionDesc = new JLabel("Cloudy");
-      weatherConditionDesc.setBounds(0, 400, 450, 36);
+      weatherConditionDesc.setBounds(0, 430, 450, 36);
       weatherConditionDesc.setFont(new Font("Poppins", Font.PLAIN, 32));
       weatherConditionDesc.setHorizontalAlignment(SwingConstants.CENTER);
       add(weatherConditionDesc);
@@ -132,6 +142,7 @@ public class WeatherAppGui extends JFrame {
          double windSpeed = (double) weatherData.get("windspeed");
          windSpeedText.setText("<html><b>Wind Speed</b> " + windSpeed + "km/h</html>");
       });
+
       add(searchButton);
    }
 

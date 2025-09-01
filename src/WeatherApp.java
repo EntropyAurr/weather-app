@@ -11,9 +11,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
-// retrieve weather data from API, then the GUI will display to the user
+// retrieve weather data from API for the GUI to display
 public class WeatherApp {
-   // fetch weather data for given location
    public static JSONObject getWeatherData(String locationName) {
       JSONArray locationData = getLocationData(locationName);
 
@@ -23,9 +22,9 @@ public class WeatherApp {
       double latitude = (double) location.get("latitude");
       double longitude = (double) location.get("longitude");
 
-      // build API request URL with location coordination
+      // build another API request URL with location coordination
       String urlString = "https://api.open-meteo.com/v1/forecast?latitude=" + latitude + "&longitude=" +
-             + longitude + "&hourly=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m";
+             longitude + "&hourly=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m";
 
       try {
          // call the API and get response
@@ -48,8 +47,8 @@ public class WeatherApp {
             resultJson.append(scanner.nextLine());
          }
 
+         // close scanner and url connection
          scanner.close();
-
          connection.disconnect();
 
          // parse the data
@@ -58,8 +57,6 @@ public class WeatherApp {
 
          // retrieve hourly data
          JSONObject hourly = (JSONObject) resultJsonObj.get("hourly");
-
-         // we want to get the current hour's data => we need to get the index of current hour
          JSONArray time = (JSONArray) hourly.get("time");
          int index = findIndexOfCurrentTime(time);
 
@@ -99,28 +96,30 @@ public class WeatherApp {
       // replace any whitespace in location name to '+' to adhere to API's request format
       locationName = locationName.replaceAll(" ", "+");
 
-      String urlString = "https://geocoding-api.open-meteo.com/v1/search?name=" + locationName + "&count=10&language=en&format=json";
+      String urlString = "https://geocoding-api.open-meteo.com/v1/search?name=" + locationName +
+                         "&count=10&language=en&format=json";
 
       try {
          HttpURLConnection connection = fetchApiResponse(urlString);
 
          // check response status
+         assert connection != null;
          if (connection.getResponseCode() != 200) {
             System.out.println("Error: Could not connect to API for location name");
 
             return null;
          } else {
-            // store the API results
+            // get the API data (JSON Object)
             StringBuilder resultJson = new StringBuilder();
             Scanner scanner = new Scanner(connection.getInputStream());
 
+            // store the data into StringBuilder
             while (scanner.hasNext()) {
                resultJson.append(scanner.nextLine());
             }
 
+            // close scanner and url connection
             scanner.close();
-
-            // close url connection
             connection.disconnect();
 
             // parse JSON string to JSON object
@@ -128,7 +127,9 @@ public class WeatherApp {
             JSONObject resultJsonObj = (JSONObject) parser.parse(String.valueOf(resultJson));
 
             // get the list of location data that the API generated from the location name
-            JSONArray locationData = (JSONArray) resultJsonObj.get("results");
+            JSONArray locationData;
+            locationData = (JSONArray) resultJsonObj.get("results");
+
             return locationData;
          }
       }
@@ -147,10 +148,8 @@ public class WeatherApp {
          URL url = uri.toURL();
          HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-         // set request method to get
+         // set request method and connect to API
          connection.setRequestMethod("GET");
-
-         // connect to the API
          connection.connect();
 
          return connection;
@@ -178,13 +177,16 @@ public class WeatherApp {
          }
       }
 
+      // safely return in case of there is error in the for loop
       return 0;
    }
 
    public static String getCurrentTime() {
       LocalDateTime currentDateTime = LocalDateTime.now();
       DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy'T'HH:mm:00");
-      String formattedDateTime = currentDateTime.format(formatter);
+
+      String formattedDateTime;
+      formattedDateTime = currentDateTime.format(formatter);
 
       return formattedDateTime;
    }
